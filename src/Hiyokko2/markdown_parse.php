@@ -1,5 +1,15 @@
 <?php
 
+namespace Hiyokko2;
+
+class Tako
+{
+    public static function aaa() {
+        echo "aaa";
+    }
+}
+
+/*
 require_once "/var/www/blog/vendor/autoload.php";
 
 //★★★大本命の実装　エバーノートに確定仕様を記述！！！
@@ -322,3 +332,4 @@ function my_preg_match($pat, $markdown, $default = "")
     preg_match($pat, $markdown, $result);
     return $result[1] ? $result[1] : $default;
 }
+ */

@@ -8,5 +8,10 @@
         }
     ],
     "require": {},
-    "license": "MIT"
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Hiyokko2\\": "src"
+        }
+    }
 }
