@@ -1,0 +1,11 @@
+{
+    "name": "hiyokko2/hiyokko2_text_parser",
+    "description": "My private text parser.",
+    "authors": [
+        {
+            "name": "hiyokko2",
+            "email": "yumiya0403two@gmail.com"
+        }
+    ],
+    "require": {}
+}
