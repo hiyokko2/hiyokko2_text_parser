@@ -8,6 +8,7 @@ error_reporting(E_ERROR & ~E_WARNING & ~E_PARSE & ~E_NOTICE);
 
 require "../src/TextParser.php";
 // use Hiyokko2\TextParser;
+require "test_funcs.php";
 
 function test_not_exist_title()
 {
@@ -30,35 +31,19 @@ function test_equal_title()
     return "aaa" == TextParser::parse("#title(aaa)")[title];
 }
 
-function throw_exception($ex_class, $func)
+function test_replace_block_before()
 {
-    try {
-        $func();
-    } catch (\Exception $e) {
-        if (get_class($e) == "Hiyokko2\\" . $ex_class) {
-            return true;
-        }
-    }
-    return false;
+    $mark = "#python
+print(123)
+#python_end
+#python
+for i in range(10):
+#python_end
+";
+    // var_dump(TextParser::parse_html_replace_block_before($mark));
+    list($res_mark, $res_match) = TextParser::parse_html_replace_block_before($mark);
+    // var_dump($res_mark);
+    return include_string($res_mark, "___python_0") && include_string($res_mark, "___python_1");
 }
 
-// test_not_exist_title();
-
-$ok = true;
-foreach (get_defined_functions()[user] as $test_func) {
-    if (substr($test_func, 0, 14) == "hiyokko2\\test_") {
-        echo $test_func . "\n";
-        if ($test_func()) {
-            echo "OK! OOOOO\n";
-        } else {
-            $ok = false;
-            echo "NG! XXXXX\n";
-        }
-        echo "-------------------------\n\n";
-    }
-}
-if ($ok) {
-    echo "ALL OK\n";
-} else {
-    echo "NOT OK\n";
-}
+do_test_all();
