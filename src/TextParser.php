@@ -125,7 +125,7 @@ class TextParser
 
     public static function parse_html_replace_block_after($html, $matches)
     {
-        global $block_starter;
+        $block_starter = ["python", "susiki", "wide_susiki", "ul", "ol"];
 
         foreach ($block_starter as $starter) {
             for ($i = 0; $i < count($matches[$starter]); $i++) {

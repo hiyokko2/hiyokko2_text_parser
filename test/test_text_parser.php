@@ -46,4 +46,23 @@ for i in range(10):
     return include_string($res_mark, "___python_0") && include_string($res_mark, "___python_1");
 }
 
+function test_parse_html_ul()
+{
+    $mark = "#ul
+aaa
+bbb
+ccc
+#ul_end
+";
+
+    $html = TextParser::parse_html($mark);
+    return include_string($html,
+        "<ul>",
+        "<li>aaa</li>",
+        "<li>bbb</li>",
+        "<li>ccc</li>",
+        "</ul>"
+    );
+}
+
 do_test_all();

@@ -12,9 +12,16 @@ function throw_exception($ex_class, $func)
     return false;
 }
 
-function include_string($subject, $needle)
+function include_string()
 {
-    return strpos($subject, $needle) !== false;
+    $args = func_get_args();
+    $subject = $args[0];
+    for ($i = 1; $i < count($args); $i++) {
+        if (strpos($subject, $args[$i]) === false) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function do_test_all()
