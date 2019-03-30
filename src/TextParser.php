@@ -28,7 +28,7 @@ class TextParser
         $res = [
             title => my_preg_match('/#title\(([^\)]*)\)/s', $markdown),
             thumbnail => my_preg_match('/#thumb\(([^\)]+)\)/s', $markdown),
-            status => my_preg_match('/#status\(([^\)]+)\)/', $markdown, "draft"),
+            // status => my_preg_match('/#status\(([^\)]+)\)/', $markdown, "draft"),
             pickup => intval(my_preg_match('/#pickup\(([^\)]+)\)/', $markdown, "0")),
             content_no_tag => $content_no_tag,
             description => $description,
@@ -115,7 +115,7 @@ class TextParser
             } else if (substr($line, 0, 3) == "___") {
                 // この何もしないところがないと<br>が挿入されてしまう
             } else {
-                $line .= "<br class=\"bbb\">";
+                $line .= "<br>";
             }
 
             $html .= $line;
