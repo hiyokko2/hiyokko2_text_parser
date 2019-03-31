@@ -26,17 +26,17 @@ class TextParser
         $description = mb_substr($content_no_tag, 0, 120, "UTF-8");
 
         $res = [
-            title => my_preg_match('/#title\(([^\)]*)\)/s', $markdown),
-            thumbnail => my_preg_match('/#thumb\(([^\)]+)\)/s', $markdown),
+            "title" => my_preg_match('/#title\(([^\)]*)\)/s', $markdown),
+            "thumbnail" => my_preg_match('/#thumb\(([^\)]+)\)/s', $markdown),
             // status => my_preg_match('/#status\(([^\)]+)\)/', $markdown, "draft"),
-            pickup => intval(my_preg_match('/#pickup\(([^\)]+)\)/', $markdown, "0")),
-            content_no_tag => $content_no_tag,
-            description => $description,
-            html => $html,
-            categories => $categories,
+            "pickup" => intval(my_preg_match('/#pickup\(([^\)]+)\)/', $markdown, "0")),
+            "content_no_tag" => $content_no_tag,
+            "description" => $description,
+            "html" => $html,
+            "categories" => $categories,
         ];
 
-        if ($res[title] == "") {
+        if ($res["title"] == "") {
             throw new NoTitleException("titleが指定されていません。");
         }
 
@@ -173,5 +173,9 @@ class TextParser
 function my_preg_match($pat, $markdown, $default = "")
 {
     preg_match($pat, $markdown, $result);
-    return $result[1] ? $result[1] : $default;
+    if (isset($result[1])) {
+        return $result[1] ? $result[1] : $default;
+    } else {
+        return $default;
+    }
 }

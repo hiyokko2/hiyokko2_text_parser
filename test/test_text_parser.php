@@ -4,7 +4,7 @@ namespace Hiyokko2;
 
 // ini_set("display_errors", 0);
 // error_reporting(0);
-error_reporting(E_ERROR & ~E_WARNING & ~E_PARSE & ~E_NOTICE);
+//error_reporting(E_ERROR & ~E_WARNING & ~E_PARSE & ~E_NOTICE);
 
 require "../src/TextParser.php";
 // use Hiyokko2\TextParser;
@@ -28,7 +28,7 @@ function test_exist_title()
 
 function test_equal_title()
 {
-    return "aaa" == TextParser::parse("#title(aaa)")[title];
+    return "aaa" == TextParser::parse("#title(aaa)")["title"];
 }
 
 function test_replace_block_before()
@@ -46,6 +46,19 @@ for i in range(10):
     return include_string($res_mark, "___python_0") && include_string($res_mark, "___python_1");
 }
 
+function test_parse_html_h()
+{
+    $mark = "*aaa
+**bbb
+***ccc";
+    $html = TextParser::parse_html($mark);
+    return include_string($html,
+        "<h2>aaa</h2>",
+        "<h3>bbb</h3>",
+        "<h4>ccc</h4>"
+    );
+}
+
 function test_parse_html_ul()
 {
     $mark = "#ul
@@ -56,6 +69,7 @@ ccc
 ";
 
     $html = TextParser::parse_html($mark);
+    // print_r($html);
     return include_string($html,
         "<ul>",
         "<li>aaa</li>",
@@ -65,5 +79,44 @@ ccc
     );
 }
 
-do_test_all();
+function test_parse_html_ol()
+{
+    $mark = "#ol
+aaa
+bbb
+ccc
+#ol_end
+";
 
+    $html = TextParser::parse_html($mark);
+    // print_r($html);
+    return include_string($html,
+        "<ol>",
+        "<li>aaa</li>",
+        "<li>bbb</li>",
+        "<li>ccc</li>",
+        "</ol>"
+    );
+}
+
+function test_parse_html_blank()
+{
+    $mark = "blank(リンク表示名,https://aaa.com)";
+    $html = TextParser::parse_html($mark);
+    // print_r($html);
+    return include_string($html,
+        "<a href=\"https://aaa.com\" target=\"_blank\">リンク表示名</a>"
+    );
+}
+
+function test_parse_html_b()
+{
+    $mark = "b(太字にしたい文字列)";
+    $html = TextParser::parse_html($mark);
+    // print_r($html);
+    return include_string($html,
+        "<b>太字にしたい文字列</b>"
+    );
+}
+
+do_test_all();
