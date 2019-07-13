@@ -3,16 +3,18 @@
 namespace Hiyokko2;
 
 class NoTitleException extends \Exception
-{}
+{
+}
 
 class AException extends \Exception
-{}
+{
+}
 
 class TextParser
 {
     //★★★大本命の実装　エバーノートに確定仕様を記述！！！
     // public static function markdown_parse_kakutei_siyou($markdown)
-    public static function parse($markdown)
+    public static function parse($markdown, $throw_exception = true)
     {
         $categories = my_preg_match('/#cat\(([^\)]+)\)/s', $markdown);
         if ($categories != "") {
@@ -36,7 +38,7 @@ class TextParser
             "categories" => $categories,
         ];
 
-        if ($res["title"] == "") {
+        if ($throw_exception && $res["title"] == "") {
             throw new NoTitleException("titleが指定されていません。");
         }
 
@@ -63,13 +65,16 @@ class TextParser
 
         //行ごとではない一括置換
         //b()はブロックを置換した後にする
-        $markdown = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $markdown);
+        //！！！ここでやるとブロック内のbタグが変換されないのでparse_html_replace_block_after後に移動した
+        //$markdown = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $markdown);
 
         //行ごとの処理
         $html = self::parse_html_line_process($markdown);
 
         //タグに置換されていた複数行ブロックを元に戻す
         $html = self::parse_html_replace_block_after($html, $matches);
+
+        $html = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $html);
 
         return $html;
     }
@@ -100,19 +105,19 @@ class TextParser
         foreach ($lines as $line) {
             if (substr($line, 0, 1) == "#") {
                 continue;
-            } else if ($line == "") {
+            } elseif ($line == "") {
                 continue;
-            } else if ($line == "-") {
+            } elseif ($line == "-") {
                 $line = "<br>";
-            } else if (preg_match('/^\*\*\*(.+)$/', $line, $result)) {
+            } elseif (preg_match('/^\*\*\*(.+)$/', $line, $result)) {
                 $line = "<h4>{$result[1]}</h4>";
-            } else if (preg_match('/^\*\*(.+)$/', $line, $result)) {
+            } elseif (preg_match('/^\*\*(.+)$/', $line, $result)) {
                 // $line = "<h3 style=\"border-bottom: solid 2px midnightblue; font-size: 1.2rem; background: white;\">{$result[1]}</h2>";
                 $line = "<h3>{$result[1]}</h3>";
-            } else if (preg_match('/^\*(.+)$/', $line, $result)) {
+            } elseif (preg_match('/^\*(.+)$/', $line, $result)) {
                 // $line = "<h2 style=\"border-bottom: double 5px midnightblue; font-size: 1.7rem;\">{$result[1]}</h1>";
                 $line = "<h2>{$result[1]}</h2>";
-            } else if (substr($line, 0, 3) == "___") {
+            } elseif (substr($line, 0, 3) == "___") {
                 // この何もしないところがないと<br>が挿入されてしまう
             } else {
                 $line .= "<br>";
@@ -133,16 +138,16 @@ class TextParser
                     $replace = '<pre style="line-height: 1.4rem; font-size: 1.3rem;"><code class="python">';
                     $replace .= $matches[$starter][$i];
                     $replace .= '</code></pre>';
-                } else if ($starter == 'susiki') {
+                } elseif ($starter == 'susiki') {
                     $replace = '<div class="susiki">$';
                     $replace .= $matches[$starter][$i];
                     $replace .= '$</div>';
-                } else if ($starter == 'wide_susiki') {
+                } elseif ($starter == 'wide_susiki') {
                     $replace = '<div class="wide_susiki">$';
                     $replace .= $matches[$starter][$i];
                     $replace .= '$</div>';
-                } else if ($starter == 'ul') {
-                    $list = explode("\n", $matches[$starter][$i]);
+                } elseif ($starter == 'ul') {
+                    $list = explode("\n", trim($matches[$starter][$i]));
                     $replace = '<ul>';
                     foreach ($list as $li) {
                         if ($li == "") {
@@ -151,8 +156,8 @@ class TextParser
                         $replace .= "<li>{$li}</li>";
                     }
                     $replace .= '</ul>';
-                } else if ($starter == 'ol') {
-                    $list = explode("\n", $matches[$starter][$i]);
+                } elseif ($starter == 'ol') {
+                    $list = explode("\n", trim($matches[$starter][$i]));
                     $replace = '<ol>';
                     foreach ($list as $li) {
                         if ($li == "") {
