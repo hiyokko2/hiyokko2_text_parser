@@ -134,12 +134,16 @@ class TextParser
                 // この何もしないところがないと<br>が挿入されてしまう
             } elseif (preg_match('/^\\\\\[.+\\\\\]$/', $line)) {
                 // 何もせずelseでbrを追加しない
+            } elseif (preg_match('/^<a .+<\/a>$/', $line)) {
+                // aタグのみなら改行付ける
+                $line .= "<br>";
+            } elseif (preg_match('/^b(.+)$/', $line)) {
+                // bタグのみなら改行付ける
+                $line .= "<br>";
             } elseif (preg_match('/^<.+>$/', $line)) {
                 // タグを直接書いている場合何もしない
             } else {
-                if ($pre_head_flag) {
-                    $pre_head_flag = false;
-                } else {
+                if (!$pre_head_flag) {
                     $line .= "<br>";
                 }
             }
@@ -147,6 +151,11 @@ class TextParser
             // 空行は連続2行以上から<br>に変換する
             if ($line != "") {
                 $blank_line_flag = false;
+            }
+
+            // hタグでない場合pre_head_flagをfalseにする
+            if (!preg_match('/^\*(.+)$/', $line)) {
+                $pre_head_flag = false;
             }
 
             $html .= $line;
