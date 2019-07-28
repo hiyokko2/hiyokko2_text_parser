@@ -102,25 +102,51 @@ class TextParser
         $html = "";
         $lines = explode("\n", $markdown);
 
+        $pre_head_flag = false;
+        $blank_line_flag = false;
         foreach ($lines as $line) {
+            $line = trim($line);
+//            var_dump($line);
+
             if (substr($line, 0, 1) == "#") {
                 continue;
             } elseif ($line == "") {
-                continue;
+                if ($blank_line_flag) {
+                    $line = "<br>";
+                } else {
+                    $blank_line_flag = true;
+                    continue;
+                }
             } elseif ($line == "-") {
                 $line = "<br>";
             } elseif (preg_match('/^\*\*\*(.+)$/', $line, $result)) {
                 $line = "<h4>{$result[1]}</h4>";
+                $pre_head_flag = true;
             } elseif (preg_match('/^\*\*(.+)$/', $line, $result)) {
                 // $line = "<h3 style=\"border-bottom: solid 2px midnightblue; font-size: 1.2rem; background: white;\">{$result[1]}</h2>";
                 $line = "<h3>{$result[1]}</h3>";
+                $pre_head_flag = true;
             } elseif (preg_match('/^\*(.+)$/', $line, $result)) {
                 // $line = "<h2 style=\"border-bottom: double 5px midnightblue; font-size: 1.7rem;\">{$result[1]}</h1>";
                 $line = "<h2>{$result[1]}</h2>";
+                $pre_head_flag = true;
             } elseif (substr($line, 0, 3) == "___") {
                 // この何もしないところがないと<br>が挿入されてしまう
+            } elseif (preg_match('/^\\\\\[.+\\\\\]$/', $line)) {
+                // 何もせずelseでbrを追加しない
+            } elseif (preg_match('/^<.+>$/', $line)) {
+                // タグを直接書いている場合何もしない
             } else {
-                $line .= "<br>";
+                if ($pre_head_flag) {
+                    $pre_head_flag = false;
+                } else {
+                    $line .= "<br>";
+                }
+            }
+
+            // 空行は連続2行以上から<br>に変換する
+            if ($line != "") {
+                $blank_line_flag = false;
             }
 
             $html .= $line;
