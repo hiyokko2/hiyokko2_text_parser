@@ -136,6 +136,15 @@ blank(リンク表示名,https://aaa.com)
 <a href="https://aaa.com" target="_blank">リンク表示名</a>
 ```
 
+### blankじゃない普通のリンク
+```
+link(リンク表示名,https://aaa.com)
+```
+は次のように変換される。
+```
+<a href="https://aaa.com">リンク表示名</a>
+```
+
 ### 太字
 ```
 b(太字にしたい文字列)
