@@ -50,6 +50,7 @@ class TextParser
         //行ごとではない一括置換
         //b()はコードブロックに悪影響を与えそうなので後で行う
         $markdown = preg_replace("/blank\(([^,]+),([^\)]+)\)/", "<a href=\"\$2\" target=\"_blank\">\$1</a>", $markdown);
+        $markdown = preg_replace("/link\(([^,]+),([^\)]+)\)/", "<a href=\"\$2\">\$1</a>", $markdown);
 
         // まずは複数行ブロックを置換する
         // #python
