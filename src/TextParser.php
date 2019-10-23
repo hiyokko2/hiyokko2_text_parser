@@ -61,6 +61,10 @@ class TextParser
         // #python_0
         //返り値の$markdownには置換後のマークダウンが、$matchesには置換した部分に入るコンテンツが入る
         list($markdown, $matches) = self::parse_html_replace_block_before($markdown);
+        // $matchesのうちpythonについては内容の先頭末尾の改行を削除する
+        for ($i=0; $i < count($matches["python"]); $i++) {
+            $matches["python"][$i] = trim($matches["python"][$i]);
+        }
 
         // file_put_contents("zzzzzzzzzzzz.txt", $markdown);
 
@@ -178,7 +182,7 @@ class TextParser
         foreach ($block_starter as $starter) {
             for ($i = 0; $i < count($matches[$starter]); $i++) {
                 if ($starter == 'python') {
-                    $replace = '<pre style="line-height: 1.4rem; font-size: 1.3rem;"><code class="python">';
+                    $replace = '<pre style="line-height: 1.4rem; font-size: 1.2rem; width: 90%;"><code class="python">';
                     $replace .= $matches[$starter][$i];
                     $replace .= '</code></pre>';
                 } elseif ($starter == 'susiki') {
