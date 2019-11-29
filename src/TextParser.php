@@ -65,6 +65,10 @@ class TextParser
         for ($i=0; $i < count($matches["python"]); $i++) {
             $matches["python"][$i] = trim($matches["python"][$i]);
         }
+        // c++も $matchesのうちpythonについては内容の先頭末尾の改行を削除する
+        for ($i=0; $i < count($matches["cpp"]); $i++) {
+            $matches["cpp"][$i] = trim($matches["cpp"][$i]);
+        }
 
         // file_put_contents("zzzzzzzzzzzz.txt", $markdown);
 
@@ -76,17 +80,22 @@ class TextParser
         //行ごとの処理
         $html = self::parse_html_line_process($markdown);
 
+        // ブロックの外についてはここでbの変換する
+        $html = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $html);
+
         //タグに置換されていた複数行ブロックを元に戻す
         $html = self::parse_html_replace_block_after($html, $matches);
 
-        $html = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $html);
+        // ★複数行ブロックについてはこの処理をするかしないか判断したいのでここではしない
+        //   parse_html_replace_block_afterの中で判断して行う
+        // $html = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $html);
 
         return $html;
     }
 
     public static function parse_html_replace_block_before($markdown)
     {
-        $block_starter = ["python", "susiki", "wide_susiki", "ul", "ol"];
+        $block_starter = ["python", "cpp", "susiki", "wide_susiki", "ul", "ol"];
 
         $matches = [];
         foreach ($block_starter as $starter) {
@@ -177,13 +186,17 @@ class TextParser
 
     public static function parse_html_replace_block_after($html, $matches)
     {
-        $block_starter = ["python", "susiki", "wide_susiki", "ul", "ol"];
+        $block_starter = ["python", "cpp", "susiki", "wide_susiki", "ul", "ol"];
 
         foreach ($block_starter as $starter) {
             for ($i = 0; $i < count($matches[$starter]); $i++) {
                 if ($starter == 'python') {
                     $replace = '<pre style="line-height: 1.4rem; font-size: 1.2rem; width: 90%;"><code class="python">';
-                    $replace .= $matches[$starter][$i];
+                    $replace .= htmlspecialchars($matches[$starter][$i]);
+                    $replace .= '</code></pre>';
+                } elseif ($starter == "cpp") {
+                    $replace = '<pre class="code"><code class="cpp">';
+                    $replace .= htmlspecialchars($matches[$starter][$i]);
                     $replace .= '</code></pre>';
                 } elseif ($starter == 'susiki') {
                     $replace = '<div class="susiki">$';
@@ -194,6 +207,7 @@ class TextParser
                     $replace .= $matches[$starter][$i];
                     $replace .= '$</div>';
                 } elseif ($starter == 'ul') {
+                    $matches[$starter][$i] = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $matches[$starter][$i]);
                     $list = explode("\n", trim($matches[$starter][$i]));
                     $replace = '<ul>';
                     foreach ($list as $li) {
@@ -204,6 +218,7 @@ class TextParser
                     }
                     $replace .= '</ul>';
                 } elseif ($starter == 'ol') {
+                    $matches[$starter][$i] = preg_replace("/b\(([^\)]+)\)/", "<b>\$1</b>", $matches[$starter][$i]);
                     $list = explode("\n", trim($matches[$starter][$i]));
                     $replace = '<ol>';
                     foreach ($list as $li) {
